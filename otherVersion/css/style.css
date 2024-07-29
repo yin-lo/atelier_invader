@@ -1,0 +1,97 @@
+body {
+	background-color: #5771e4;
+}
+/* le formulaire */
+.configuration {
+	background-color: #3c40c6;
+	height: 150px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.configuration input,
+.configuration button {
+	padding: 1rem;
+	border: none;
+	font-size: 1.2em;
+	border-radius: 20px;
+}
+
+.configuration input {
+	width: 13rem;
+	margin-right: 8px;
+}
+
+.configuration button {
+	background-color: #8b57e4;
+	color: white;
+	cursor: pointer;
+}
+
+/* la grille */
+#invader {
+	background-color: #5771e4;
+	width: 100%;
+	min-height: calc(100vh - 150px);
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.row {
+	display: flex;
+}
+
+.pixel {
+	/* plus besoin width et height avec la feuille app.js */
+	width: 20px;
+	height: 20px;
+	/* ! mais besoin avec le app2.js */
+	background-color: white;
+	border: 2px solid grey;
+}
+
+/* la palette */
+.palette {
+	position: fixed;
+	bottom: 0;
+	right: 0;
+}
+
+.palette-color {
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	margin: 5px;
+	cursor: pointer;
+}
+.palette--empty {
+	background-color: white;
+}
+.palette--plain {
+	background-color: black;
+}
+.palette--light {
+	background-color: rgb(22, 132, 16);
+}
+.palette--highlight {
+	background-color: rgb(216, 118, 31);
+}
+
+.pixel--empty {
+	background-color: white;
+}
+
+.pixel--plain {
+	background-color: black;
+}
+
+.pixel--light {
+	background-color: rgb(22, 132, 16);
+}
+
+.pixel--highlight {
+	background-color: rgb(216, 118, 31);
+}
