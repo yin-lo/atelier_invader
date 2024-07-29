@@ -1,100 +1,185 @@
-document.addEventListener('DOMContentLoaded', function () {
-	const app = {
-		styles: ['plain', 'empty', 'light', 'highlight'],
-		colorCircles: document.querySelectorAll('.colorCircle'),
-		invader: document.querySelector('#invader'),
-		form: document.querySelector('.configuration'),
-		resetButton: document.querySelector('#resetButton'),
-		pixels: undefined,
-		color: undefined,
+/* Création d'un objet géant appelé MODULE*/
+const app = {
+	// valeur par défaut du nombre de lignes de la grille :
+	gridSize: 8,
+	pixelSize: 20,
+	styles: ['plain', 'empty', 'light', 'highlight'],
+	styleSelected: 'empty',
 
-		generateForm: function () {
-			const formHTML = document.querySelector('.configuration');
-			// eslint-disable-next-line quotes
-			let html = `<div><label id="inputGrid" for="inputGrid">Taille de la grille (de 3 à 15) : <span id="gridDefault">??</span></label><input type="range"id="inputGrid"name="inputGrid"min="3"max="15"step="1"/></div><div><label id="inputPixels" for="inputPixels">Taille en pixel (de 20px à 60px) : <span id="pixelDefault">??</span></label><input type="range" id="inputPixels" min="20" max="60" step="2" /></div>`;
-			formHTML.innerHTML = html;
-		},
+	init: function () {
+		console.log(app.gridSize);
+		// execution des fonctions au lancement
+		app.fillForm();
+		app.generateArea();
+		app.generatePalette();
+	},
 
-		getPixels: function () {
-			let isMouseDown = false;
+	/* la grille */
+	generateArea: function () {
+		const gridArea = document.getElementById('invader');
+		// 1re boucle qui va générer les div row
+		for (let i = 0; i < app.gridSize; i++) {
+			// créer l'élément div :
+			const row = document.createElement('div');
+			// ajouter une classe row :
+			row.classList.add('row');
+			// une fois la ligne créée, créer les div pixel dans chaque ligne row :
+			for (let i = 0; i < app.gridSize; i++) {
+				const pixel = document.createElement('div');
+				pixel.setAttribute('class', 'pixel');
+				//  ci dessus on peut écrire pixel.classList.add('pixel');
+				pixel.style.width = app.pixelSize + 'px';
+				pixel.style.height = app.pixelSize + 'px';
+				// ajouter les pixel dans la ligne en cours de création :
+				row.appendChild(pixel); /* : correspond à l'étape 2 = trouver l'element à écouter */
+				// à mon pixel, je lui ajoute l'écouteur d'event(etape 3) :
+				pixel.addEventListener('click', app.handlePixelClick);
+			}
+			// ajouter la ligne comme enfant de div invader
+			gridArea.appendChild(row);
+		}
+	},
+	//* au click (pour changer la couleur et l'enlever)
+	// (étape 1 : créer la fonction sur le pixel)
+	handlePixelClick: function (event) {
+		/*  console.log(event): donne toutes les infos concernant l'objet event */
+		// on récupère l'élément  sur lequel a lieu l'event grâce à event.target :
+		const pixel = event.target;
+		/* 1re version (mettre du css dans le js / pas bonne pratique) = pixel.style.backgroundColor = 'black'; */
+		/* 2e version, à rajouter une classe en css :
+	puis = si on a la couleur, il faut l'enveler et vice versa : 
+	if (pixel.classList.contains('pixel--plain')) {
+		pixel.classList.remove('pixel--plain');
+	} else {
+		pixel.classList.add('pixel--plain');
+	} */
+		/*3e version : le toggle*/
+		/* pixel.classList.toggle('pixel--light'); */
+		
 
-			document.addEventListener('mousedown', () => (isMouseDown = true));
-			document.addEventListener('mouseup', () => (isMouseDown = false));
+		// pour cliquer sur la palette de couleur :
+		for(const style of app.styles){
+			pixel.classList.remove('pixel--' + style);
+		}
+		pixel.classList.add('pixel--' + app.styleSelected);
+	},
 
-			this.pixels = document.querySelectorAll('.pixel');
-			this.pixels.forEach((element) => {
-				element.addEventListener('mouseover', function (event) {
-					if (isMouseDown) {
-						if (event.target.classList[1] && event.target.classList[1] !== app.color) {
-							event.target.classList.replace(event.target.classList[1], app.color);
-						} else if (!event.target.classList[1]) {
-							event.target.classList.add(app.color);
-						}
-					}
-				});
+	/* le formulaire */
+	fillForm: function () {
+		// on récupère la class du formulaire :
+		const form = document.querySelector('.configuration');
 
-				element.addEventListener('click', function (event) {
-					if (event.target.classList[1] && event.target.classList[1] !== app.color) {
-						event.target.classList.replace(event.target.classList[1], app.color);
-					} else if (event.target.classList[1] === app.color) {
-						event.target.classList.remove(app.color);
-					} else {
-						event.target.classList.add(app.color);
-					}
-				});
-			});
-		},
+		// *les INPUTS ----
+		// on crée et ajoute les input :
+		const inputElement = document.createElement('input');
+		// pour ajouter les attributs :
+		inputElement.setAttribute('type', 'number');
+		inputElement.setAttribute('id', 'grid-size');
+		inputElement.setAttribute('placeholder', 'Taille de la grille');
+		// on les ajoute ensuite dans le DOM :
+		form.appendChild(inputElement);
 
-		removeSelected: function () {
-			this.colorCircles.forEach((element) => {
-				element.classList.remove('selected');
-			});
-		},
+		const inputPixel = document.createElement('input');
+		inputPixel.setAttribute('type', 'number');
+		inputPixel.setAttribute('id', 'pixel-size');
+		inputPixel.setAttribute('placeholder', 'Taille du pixel');
+		form.appendChild(inputPixel);
 
-		resetColors: function () {
-			this.pixels = document.querySelectorAll('.pixel');
-			this.pixels.forEach((element) => {
-				const pixelColor = element.classList[1];
-				element.classList.remove(pixelColor);
-			});
-		},
+		// * LE BOUTON ----
+		const buttonElement = document.createElement('button');
+		// pour ajouter les attributs :
+		buttonElement.type = 'submit';
+		buttonElement.textContent = 'Valider';
+		// on les ajoute ensuite dans le DOM :
+		form.appendChild(buttonElement);
 
-		init: function () {
-			this.generateForm();
+		// écouteur de l'évenement (de l'étape 2 : form et 3) :
+		form.addEventListener('submit', app.handleSubmit);
+	},
 
-			this.form.addEventListener('change', function () {
-				app.invader.innerHTML = '';
+	//* dans le formulaire,
+	// fonction de l'écouteur sur le submit (étape 1) :
+	// ! Attention, l'écouteur ne se met pas sur le bouton submit mais sur le formulaire lui-même !
+	handleSubmit: function (event) {
+		// stoppe le comportement par défaut du formulaire :
+		event.preventDefault();
+		/* console.dir(event.target); */
+		// l'index 0 correspond à #grid-size :
+		const gridInput = event.target[0];
+		// met à jour la taille de la grille. :
+		// ! l'input sort en string
+		// donc on utiliser Number :
+		app.gridSize = Number(gridInput.value);
 
-				const inputs = document.querySelectorAll('input');
-				const inputGrid = inputs[0].value;
-				const inputPixels = inputs[1].value;
-				const spanGrid = document.querySelector('#gridDefault');
-				const spanPixels = document.querySelector('#pixelDefault');
-				spanGrid.textContent = inputGrid;
-				spanPixels.textContent = inputPixels;
+		// pour le 2e input :
+		const pixelInput = event.target[1];
+		app.pixelSize = Number(pixelInput.value);
 
-				app.invader.style.width = `${inputGrid * inputPixels}px`;
-				app.invader.style.height = `${inputGrid * inputPixels}px`;
-				for (i = 0; i < inputGrid * inputGrid; i++) {
-					const div = document.createElement('div');
-					app.invader.appendChild(div).classList.add('pixel');
-					div.style.width = `${inputPixels}px`;
-					div.style.height = `${inputPixels}px`;
-				}
-				app.getPixels();
-			});
+		//* génération d'une nouvelle grille avec la nouvelle donnée récupéré ci-dessus :
+		// si la grille est différent de zéro s.
+		if (app.gridSize) {
+			app.clearGridArea();
+			app.generateArea();
+		} else {
+			alert('tu dois saisir un nombre');
+		}
+	},
 
-			this.resetButton.addEventListener('click', this.resetColors);
+	/* reset de la grille (invader) au moment du submit */
+	clearGridArea: function () {
+		const gridArea = document.getElementById('invader');
+		gridArea.innerHTML = '';
+		/*// 2e option, on récupère toutes les lignes  : 
+	const allRows = document.querySelectorAll('.row');
+	for(let i=1 ; i<allRows.lengtj ; i++){
+		allRows[i].remove();
+	} */
+	},
 
-			this.colorCircles.forEach((element) => {
-				element.addEventListener('click', function (event) {
-					app.removeSelected();
-					event.target.classList.toggle('selected');
-					app.color = event.target.classList[1];
-				});
-			});
-		},
-	};
+	/* création de la palette de couleurs */
+	generatePalette: function () {
+		// création de la div .palette en 3/4 étapes
+		const paletteElement = document.createElement('div');
+		paletteElement.classList.add('palette');
+		const body = document.querySelector('body');
+		// boucler sur les 4 styles  avec for..of / mais on n'a pas accès à l'index avec of :
+		for (const style of app.styles) {
+			const paletteButton = document.createElement('button');
+			paletteButton.classList.add('palette-color');
+			paletteButton.classList.add('palette--' + style);
 
-	app.init();
-});
+			//* dataset permet de pouvoir lier une donnée à un element html en lui créant une "data-qqch". Ici on nomme qqhch=color :
+			paletteButton.dataset.color = style;
+
+			// si c'est le style selectionné : mis en avant avec une forme particulière :
+			if (style === app.styleSelected) {
+				paletteButton.classList.add('palette-color--active');
+			}
+			paletteElement.appendChild(paletteButton);
+			paletteButton.addEventListener('click', app.handleColorPicker);
+		}
+
+		// autre méthode avec forEach (pour un tableau)
+		/* app.styles.forEach((style, index) => {
+			console.log(`index ${index}, et sa valeur ${style}`);
+		}); */
+
+		// 3e méthode avec for..in / récupère l'index / utilisable pour boucler sur un objet :
+		/* for (const index in app.styles) {
+			console.log(app.styles[index]);
+		} */
+
+		body.appendChild(paletteElement);
+	},
+
+	handleColorPicker: function(event){
+		/* console.log(event.target); */
+		const buttonClicked = event.target;
+		const colorPicked = buttonClicked.dataset.color;
+		console.log(colorPicked);
+		app.styleSelected = colorPicked;
+	},
+};
+
+//* on utilise un event sur document pour lancer app.init quand tout le DOM est chargé : (ça nous permet aussi de mettre la balise script dans le head)
+document.addEventListener('DOMContentLoaded', app.init);
