@@ -38,4 +38,4 @@ cd nomDuDepot && code .
 
 ## En ligne
 
-[Jeu pixel art](https://yin-lo.github.io/atelier_invader/html/invader.html)
+[Jeu pixel art](https://yin-lo.github.io/atelier_invader/index.html)
