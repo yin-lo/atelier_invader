@@ -3,7 +3,8 @@
 Atelier réalisé en cours de formation
 
 ## Présentation
-Créer un jeu de pixel art en JavaScript.
+Créer un jeu de pixel art en JavaScript suivant la maquette :
+![maquette à intégrer](maquette.png)
 
 ## Stack Technique
 
@@ -37,4 +38,4 @@ cd nomDuDepot && code .
 
 ## En ligne
 
-[Jeu pixel art](https://yin-lo.github.io/atelier_invader/index.html)
+[Jeu pixel art](https://yin-lo.github.io/atelier_invader/html/invader.html)
